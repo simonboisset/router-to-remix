@@ -5,7 +5,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link } from "@remix-run/react";
 
 export const SKELETON_ITEMS_COUNT = 4;
 

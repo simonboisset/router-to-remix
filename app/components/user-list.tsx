@@ -1,7 +1,8 @@
 import { List } from "@mui/material";
+import type { SerializeFrom } from "@remix-run/node";
+import { Await } from "@remix-run/react";
 import { Suspense } from "react";
-import { Await } from "react-router-dom";
-import type { User } from "../api/data";
+import type { User } from "../api/data.server";
 import { UserItem } from "./user-item";
 import {
   USER_ITEM_SKELETONS_COUNT,
@@ -9,7 +10,7 @@ import {
 } from "./user-item-skeleton";
 
 type UserListProps = {
-  users?: Promise<User[]>;
+  users: Promise<SerializeFrom<User[] | null> | undefined>;
   isLoading: boolean;
   selectedUserId?: string | null;
 };
@@ -27,7 +28,7 @@ export const UserList = ({
     )}
   >
     <Await resolve={users}>
-      {(usersList: User[]) => (
+      {(usersList) => (
         <List>
           {isLoading
             ? Array.from({ length: USER_ITEM_SKELETONS_COUNT }).map(

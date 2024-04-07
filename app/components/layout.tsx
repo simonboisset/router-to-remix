@@ -1,25 +1,27 @@
-import Add from "@mui/icons-material/Add";
-import "@mui/lab/themeAugmentation";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { Link } from "react-router-dom";
-import type { User } from "../api/data";
+import { Add } from "@mui/icons-material";
+import {
+  AppBar,
+  Box,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import type { SerializeFrom } from "@remix-run/node";
+import { Link } from "@remix-run/react";
+import type { User } from "../api/data.server";
 import { UserList } from "./user-list";
 
 const drawerWidth = 240;
 
 type LayoutProps = {
   isLoading: boolean;
-  users?: Promise<User[]>;
+  users: Promise<SerializeFrom<User[]> | undefined>;
   children: React.ReactNode;
   selectedUserId?: string | null;
 };

@@ -1,6 +1,5 @@
 import { Close } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
-import Snackbar from "@mui/material/Snackbar";
+import { IconButton, Snackbar } from "@mui/material";
 import { create } from "zustand";
 
 type State = {

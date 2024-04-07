@@ -1,12 +1,12 @@
 import { LoadingButton } from "@mui/lab";
 import { Box, Card, CardContent, Skeleton, TextField } from "@mui/material";
+import type { SerializeFrom } from "@remix-run/node";
+import { Form, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { Form, useSubmit } from "react-router-dom";
-import type { User } from "../api/data";
+import type { User } from "../api/data.server";
 
 type UserFomrProps = {
-  user?: User;
-
+  user?: SerializeFrom<User> | null | undefined;
   isCreating?: boolean;
   isUpdating?: boolean;
   isDeleting?: boolean;

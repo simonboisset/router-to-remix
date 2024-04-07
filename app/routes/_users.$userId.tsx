@@ -1,65 +1,106 @@
-import { Suspense } from "react";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  SerializeFrom,
+} from "@remix-run/node";
 import {
-  type ActionFunctionArgs,
   Await,
-  type LoaderFunctionArgs,
+  type ClientActionFunctionArgs,
+  type ClientLoaderFunctionArgs,
   defer,
   redirect,
   useLoaderData,
   useNavigation,
   useParams,
-} from "react-router-dom";
+} from "@remix-run/react";
+import { Suspense } from "react";
 import { z } from "zod";
-import { api } from "../api/api";
-import { type User, userSchema } from "../api/data";
-import { queryClient } from "../api/query-client";
+import { type User, server } from "../api/data.server";
+import { promiseOf, queryClient } from "../api/query-client";
 import { useSnackbar } from "../components/snackbar";
 import { UserForm, UserFormSkeleton } from "../components/user-form";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const userId = params.userId;
 
+  if (!userId) return null;
+  const user = await server.getUserDetails(userId);
+  return user;
+};
+
+export const clientLoader = async ({
+  params,
+  serverLoader,
+}: ClientLoaderFunctionArgs) => {
+  const userId = params.userId;
+
   if (!userId) return { user: undefined };
-  const cache = queryClient.getQueryData<User>(["get-user-details", userId]);
+  const cache = promiseOf(
+    queryClient.getQueryData<SerializeFrom<typeof loader>>([
+      "get-user-details",
+      userId,
+    ])
+  );
   const user =
     cache ||
     queryClient.fetchQuery({
       queryKey: ["get-user-details", userId],
-      queryFn: () => api.getUserDetails(userId),
+      queryFn: serverLoader<typeof loader>,
     });
 
   return defer({ user });
 };
 
-export const action = async (args: ActionFunctionArgs) => {
-  const userId = args.params.userId;
-  const formData = await args.request.formData();
+export const action = async ({ request, params }: ActionFunctionArgs) => {
+  const userId = params.userId;
+  const formData = await request.formData();
   const name = formData.get("name");
   const age = formData.get("age");
-  const setSnackbarOpen = useSnackbar.getState().setOpen;
-
-  if (args.request.method === "POST") {
+  if (request.method === "POST") {
     const user = z
       .object({ name: z.string(), age: z.string() })
       .parse({ name, age });
-    const { id } = await api.createUser(user);
+    const res = await server.createUser(user);
+    return res;
+  }
+  if (request.method === "PUT") {
+    const user = z
+      .object({ name: z.string(), age: z.string(), id: z.string() })
+      .parse({ name, age, id: userId });
+    const res = await server.updateUser(user);
+    return res;
+  }
+  if (request.method === "DELETE") {
+    if (!userId) throw new Error("User not found");
+    const res = await server.deleteUser(userId);
+    return res;
+  }
+  throw redirect("/");
+};
+
+export const clientAction = async ({
+  request,
+  params,
+  serverAction,
+}: ClientActionFunctionArgs) => {
+  const user = await serverAction<typeof action>();
+  const setSnackbarOpen = useSnackbar.getState().setOpen;
+
+  if (request.method === "POST") {
     setSnackbarOpen(true, "User created successfully");
     queryClient.setQueryData<User[] | undefined>(["get-users"], (users) => {
       if (!users) return;
-      return [...users, { ...user, id }];
+      return [...users, user];
     });
-    queryClient.setQueryData<User>(["get-user-details", id], { ...user, id });
+    queryClient.setQueryData<User>(["get-user-details", user.id], user);
     queryClient.invalidateQueries({ queryKey: ["get-users"] });
     queryClient.invalidateQueries({
-      queryKey: ["get-user-details", id],
+      queryKey: ["get-user-details", user.id],
     });
-    return redirect(`/${id}`);
+    return redirect(`/${user.id}`);
   }
 
-  if (args.request.method === "PUT") {
-    const user = userSchema.parse({ name, age, id: userId });
-    await api.updateUser(user);
-
+  if (request.method === "PUT") {
     setSnackbarOpen(true, "User updated successfully");
     queryClient.setQueryData<User[] | undefined>(["get-users"], (users) => {
       if (!users) return;
@@ -79,9 +120,7 @@ export const action = async (args: ActionFunctionArgs) => {
     return { user };
   }
 
-  if (args.request.method === "DELETE") {
-    if (!userId) throw new Error("User not found");
-    const user = await api.deleteUser(userId);
+  if (request.method === "DELETE") {
     setSnackbarOpen(true, "User deleted successfully");
     queryClient.setQueryData<User[] | undefined>(["get-users"], (users) => {
       if (!users) return;
@@ -98,7 +137,7 @@ export const action = async (args: ActionFunctionArgs) => {
 };
 
 export default function UserRoute() {
-  const { user } = useLoaderData() as { user: Promise<User | undefined> };
+  const { user } = useLoaderData<typeof clientLoader>();
   const navigation = useNavigation();
   const method = navigation.formMethod;
   const params = useParams();
@@ -114,7 +153,7 @@ export default function UserRoute() {
   return (
     <Suspense fallback={<UserFormSkeleton />}>
       <Await resolve={user}>
-        {(usr: User | undefined) => (
+        {(usr) => (
           <UserForm
             user={usr}
             isCreating={isUserCreating}
