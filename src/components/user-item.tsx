@@ -5,18 +5,18 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 
 export const SKELETON_ITEMS_COUNT = 4;
 
 type UserItemProps = {
   user: { id: string; name: string };
-  onSelectUser: (id: string) => void;
   selected?: boolean;
 };
 
-export const UserItem = ({ user, onSelectUser, selected }: UserItemProps) => (
+export const UserItem = ({ user, selected }: UserItemProps) => (
   <ListItem disablePadding>
-    <ListItemButton onClick={() => onSelectUser(user.id)} selected={selected}>
+    <ListItemButton selected={selected} component={Link} to={`/${user.id}`}>
       <ListItemIcon>
         <Person />
       </ListItemIcon>

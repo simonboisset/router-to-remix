@@ -1,97 +1,85 @@
 import { LoadingButton } from "@mui/lab";
 import { Box, Card, CardContent, Skeleton, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Form, useSubmit } from "react-router-dom";
 import type { User } from "../api/data";
 
 type UserFomrProps = {
   user?: User;
-  isLoading?: boolean;
+
   isCreating?: boolean;
   isUpdating?: boolean;
   isDeleting?: boolean;
-  onCreate?: (props: { name: string; age: string }) => void;
-  onUpdate?: (props: { id: string; name: string; age: string }) => void;
-  onDelete?: (id: string) => void;
 };
 
 export const UserForm = ({
   user,
-  isLoading,
+
   isCreating,
   isDeleting,
   isUpdating,
-  onCreate,
-  onUpdate,
-  onDelete,
 }: UserFomrProps) => {
   const [name, setName] = useState(user?.name ?? "");
   const [age, setAge] = useState(user?.age ?? "");
-
+  const submit = useSubmit();
   useEffect(() => {
     setName(user?.name ?? "");
     setAge(user?.age ?? "");
   }, [user]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (user?.id) {
-      onUpdate?.({ id: user.id, name, age });
-    } else {
-      onCreate?.({ name, age });
-    }
+  const handleDelete = async () => {
+    if (!user?.id) return;
+    submit(null, { method: "delete" });
   };
-  if (isLoading) {
-    return <UserFormSkeleton />;
-  }
+
   return (
     <Card sx={{ maxWidth: 440, width: "100%" }}>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <Form method={user?.id ? "PUT" : "POST"}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <TextField
               label="Name"
+              name="name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              disabled={isLoading || isCreating || isUpdating || isDeleting}
+              disabled={isCreating || isUpdating || isDeleting}
             />
             <TextField
               label="Age"
+              name="age"
               value={age}
               onChange={(event) => setAge(event.target.value)}
-              disabled={isLoading}
+              disabled={isCreating || isUpdating || isDeleting}
             />
             <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
               <LoadingButton
                 variant="outlined"
                 color="error"
                 type="button"
+                onClick={handleDelete}
                 loading={isDeleting}
-                disabled={isCreating || isUpdating || isLoading || !user?.id}
-                onClick={() => {
-                  if (user?.id) {
-                    onDelete?.(user.id);
-                  }
-                }}
+                disabled={isCreating || isUpdating || !user?.id}
               >
                 Delete
               </LoadingButton>
+
               <LoadingButton
                 variant="contained"
                 type="submit"
                 loading={isCreating || isUpdating}
-                disabled={isLoading || !name || !age || isDeleting}
+                disabled={!name || !age || isDeleting}
               >
                 {user?.id ? "Update" : "Create"}
               </LoadingButton>
             </Box>
           </Box>
-        </form>
+        </Form>
       </CardContent>
     </Card>
   );
 };
 
-const UserFormSkeleton = () => (
+export const UserFormSkeleton = () => (
   <Card sx={{ maxWidth: 440, width: "100%" }}>
     <CardContent>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>

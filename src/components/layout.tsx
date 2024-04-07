@@ -11,6 +11,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import { Link } from "react-router-dom";
 import type { User } from "../api/data";
 import { UserList } from "./user-list";
 
@@ -18,9 +19,8 @@ const drawerWidth = 240;
 
 type LayoutProps = {
   isLoading: boolean;
-  users?: User[];
+  users?: Promise<User[]>;
   children: React.ReactNode;
-  setSelectedUserId: (userId: string | null) => void;
   selectedUserId?: string | null;
 };
 
@@ -29,7 +29,6 @@ export const Layout = ({
   selectedUserId,
   isLoading,
   users,
-  setSelectedUserId,
 }: LayoutProps) => (
   <Box sx={{ display: "flex", height: "100vh" }}>
     <AppBar
@@ -57,17 +56,13 @@ export const Layout = ({
       <Box sx={{ overflow: "auto" }}>
         <UserList
           users={users}
-          onSelectUser={setSelectedUserId}
           isLoading={isLoading}
           selectedUserId={selectedUserId}
         />
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setSelectedUserId(null)}
-              selected={!selectedUserId}
-            >
+            <ListItemButton to="/" component={Link} selected={!selectedUserId}>
               <ListItemIcon>
                 <Add />
               </ListItemIcon>
