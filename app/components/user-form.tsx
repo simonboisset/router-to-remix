@@ -1,23 +1,26 @@
-import { LoadingButton } from "@mui/lab";
-import { Box, Card, CardContent, Skeleton, TextField } from "@mui/material";
 import type { SerializeFrom } from "@remix-run/node";
 import { Form, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import type { User } from "../api/data.server";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { LoadingButton } from "./ui/loading-button";
+import { Skeleton } from "./ui/skeleton";
+import { TextField } from "./ui/text-field";
 
 type UserFomrProps = {
   user?: SerializeFrom<User> | null | undefined;
   isCreating?: boolean;
   isUpdating?: boolean;
   isDeleting?: boolean;
+  isLoading?: boolean;
 };
 
 export const UserForm = ({
   user,
-
   isCreating,
   isDeleting,
   isUpdating,
+  isLoading,
 }: UserFomrProps) => {
   const [name, setName] = useState(user?.name ?? "");
   const [age, setAge] = useState(user?.age ?? "");
@@ -32,11 +35,18 @@ export const UserForm = ({
     submit(null, { method: "delete" });
   };
 
+  if (isLoading) {
+    return <UserFormSkeleton />;
+  }
+
   return (
-    <Card sx={{ maxWidth: 440, width: "100%" }}>
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>{user?.id ? "Edit User" : "Create User"}</CardTitle>
+      </CardHeader>
       <CardContent>
         <Form method={user?.id ? "PUT" : "POST"}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <div className="flex flex-col gap-4">
             <TextField
               label="Name"
               name="name"
@@ -51,28 +61,30 @@ export const UserForm = ({
               onChange={(event) => setAge(event.target.value)}
               disabled={isCreating || isUpdating || isDeleting}
             />
-            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+            <div className="flex flex-row justify-end gap-2">
               <LoadingButton
-                variant="outlined"
+                variant="destructive"
                 color="error"
                 type="button"
+                className="flex-1"
                 onClick={handleDelete}
-                loading={isDeleting}
+                loading={!!isDeleting}
                 disabled={isCreating || isUpdating || !user?.id}
               >
                 Delete
               </LoadingButton>
 
               <LoadingButton
-                variant="contained"
+                variant="default"
                 type="submit"
-                loading={isCreating || isUpdating}
+                className="flex-1"
+                loading={!!isCreating || !!isUpdating}
                 disabled={!name || !age || isDeleting}
               >
                 {user?.id ? "Update" : "Create"}
               </LoadingButton>
-            </Box>
-          </Box>
+            </div>
+          </div>
         </Form>
       </CardContent>
     </Card>
@@ -80,23 +92,26 @@ export const UserForm = ({
 };
 
 export const UserFormSkeleton = () => (
-  <Card sx={{ maxWidth: 440, width: "100%" }}>
+  <Card className="w-full max-w-md">
+    <CardHeader>
+      <Skeleton className="h-6 w-[240px] rounded-lg" />
+    </CardHeader>
     <CardContent>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <div className="flex flex-col gap-4">
         <TextFieldSkeleton />
         <TextFieldSkeleton />
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-          <Skeleton variant="rounded" width={100} height={40} />
-          <Skeleton variant="rounded" width={100} height={40} />
-        </Box>
-      </Box>
+        <div className="flex flex-row justify-end gap-2">
+          <Skeleton className="h-10 flex-1 rounded-lg" />
+          <Skeleton className="h-10 flex-1 rounded-lg" />
+        </div>
+      </div>
     </CardContent>
   </Card>
 );
 
 const TextFieldSkeleton = () => (
-  <Box sx={{ display: "flex", flexDirection: "column", gap: 1, with: "100%" }}>
-    <Skeleton variant="rounded" width={100} height={10} />
-    <Skeleton variant="rounded" width={"100%"} height={40} />
-  </Box>
+  <div className="flex flex-col gap-2">
+    <Skeleton className="h-4 w-[120px] rounded-lg" />
+    <Skeleton className="h-10 w-full rounded-lg" />
+  </div>
 );

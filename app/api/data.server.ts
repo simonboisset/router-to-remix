@@ -77,19 +77,22 @@ export const updateUser = async ({
     name,
     age,
   };
+  return { id, name, age };
 };
 const getUsers = async () => {
   await delay(2000);
   return users;
 };
 
-const getUserDetails = async (id: string) => {
+const getUserDetails = async (id?: string) => {
   await delay(2000);
-  console.log("id", id, users);
+  if (!id) {
+    return null;
+  }
 
   const user = users.find((user) => user.id === id);
   if (!user) {
-    throw new Error("User details not found");
+    return null;
   }
   return user;
 };

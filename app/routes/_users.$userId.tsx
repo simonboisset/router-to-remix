@@ -1,53 +1,24 @@
-import type {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  SerializeFrom,
-} from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { defer } from "@remix-run/node";
 import {
   Await,
   type ClientActionFunctionArgs,
-  type ClientLoaderFunctionArgs,
-  defer,
   redirect,
   useLoaderData,
   useNavigation,
   useParams,
 } from "@remix-run/react";
 import { Suspense } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
-import { type User, server } from "../api/data.server";
-import { promiseOf, queryClient } from "../api/query-client";
-import { useSnackbar } from "../components/snackbar";
+import { server } from "../api/data.server";
 import { UserForm, UserFormSkeleton } from "../components/user-form";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const userId = params.userId;
 
-  if (!userId) return null;
-  const user = await server.getUserDetails(userId);
-  return user;
-};
-
-export const clientLoader = async ({
-  params,
-  serverLoader,
-}: ClientLoaderFunctionArgs) => {
-  const userId = params.userId;
-
-  if (!userId) return { user: undefined };
-  const cache = promiseOf(
-    queryClient.getQueryData<SerializeFrom<typeof loader>>([
-      "get-user-details",
-      userId,
-    ])
-  );
-  const user =
-    cache ||
-    queryClient.fetchQuery({
-      queryKey: ["get-user-details", userId],
-      queryFn: serverLoader<typeof loader>,
-    });
-
+  if (!userId) return defer({ user: null });
+  const user = server.getUserDetails(userId);
   return defer({ user });
 };
 
@@ -80,64 +51,32 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 
 export const clientAction = async ({
   request,
-  params,
   serverAction,
 }: ClientActionFunctionArgs) => {
   const user = await serverAction<typeof action>();
-  const setSnackbarOpen = useSnackbar.getState().setOpen;
 
   if (request.method === "POST") {
-    setSnackbarOpen(true, "User created successfully");
-    queryClient.setQueryData<User[] | undefined>(["get-users"], (users) => {
-      if (!users) return;
-      return [...users, user];
-    });
-    queryClient.setQueryData<User>(["get-user-details", user.id], user);
-    queryClient.invalidateQueries({ queryKey: ["get-users"] });
-    queryClient.invalidateQueries({
-      queryKey: ["get-user-details", user.id],
-    });
+    toast("User created successfully");
+
     return redirect(`/${user.id}`);
   }
 
   if (request.method === "PUT") {
-    setSnackbarOpen(true, "User updated successfully");
-    queryClient.setQueryData<User[] | undefined>(["get-users"], (users) => {
-      if (!users) return;
-      return users.map((usr) => {
-        if (usr.id === user.id) {
-          return user;
-        }
-        return usr;
-      });
-    });
-    queryClient.setQueryData<User>(["get-user-details", user.id], user);
+    toast("User updated successfully");
 
-    queryClient.invalidateQueries({ queryKey: ["get-users"] });
-    queryClient.invalidateQueries({
-      queryKey: ["get-user-details", user.id],
-    });
     return { user };
   }
 
   if (request.method === "DELETE") {
-    setSnackbarOpen(true, "User deleted successfully");
-    queryClient.setQueryData<User[] | undefined>(["get-users"], (users) => {
-      if (!users) return;
-      return users.filter((usr) => usr.id !== user.id);
-    });
+    toast("User deleted successfully");
 
-    queryClient.invalidateQueries({ queryKey: ["get-users"] });
-    queryClient.invalidateQueries({
-      queryKey: ["get-user-details", user.id],
-    });
     return redirect("/");
   }
   return {};
 };
 
 export default function UserRoute() {
-  const { user } = useLoaderData<typeof clientLoader>();
+  const { user } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const method = navigation.formMethod;
   const params = useParams();
@@ -146,10 +85,10 @@ export default function UserRoute() {
     `/${params.userId || ""}`
   );
 
-  const isUserCreating = method === "post" && isSubmitting;
-  const isUserUpdating = method === "put" && isSubmitting;
-  const isUserDeleting = method === "delete" && isSubmitting;
-
+  const isUserCreating = method === "POST" && isSubmitting;
+  const isUserUpdating = method === "PUT" && isSubmitting;
+  const isUserDeleting = method === "DELETE" && isSubmitting;
+  const isLoading = navigation.state !== "idle" && !isSubmitting;
   return (
     <Suspense fallback={<UserFormSkeleton />}>
       <Await resolve={user}>
@@ -159,6 +98,7 @@ export default function UserRoute() {
             isCreating={isUserCreating}
             isUpdating={isUserUpdating}
             isDeleting={isUserDeleting}
+            isLoading={isLoading}
           />
         )}
       </Await>

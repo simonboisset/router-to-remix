@@ -1,44 +1,21 @@
-import type { SerializeFrom } from "@remix-run/node";
-import {
-  type ClientLoaderFunctionArgs,
-  Outlet,
-  defer,
-  useLoaderData,
-  useParams,
-} from "@remix-run/react";
+import { defer } from "@remix-run/node";
+import { Outlet, useLoaderData, useParams } from "@remix-run/react";
 import { server } from "../api/data.server";
-import { promiseOf, queryClient } from "../api/query-client";
 import { Layout } from "../components/layout";
 
 export const loader = async () => {
-  const users = await server.getUsers();
-  return users;
-};
-
-export const clientLoader = async ({
-  serverLoader,
-}: ClientLoaderFunctionArgs) => {
-  const cache = promiseOf(
-    queryClient.getQueryData<SerializeFrom<typeof loader>>(["get-users"])
-  );
-  const users =
-    cache ||
-    queryClient.fetchQuery({
-      queryKey: ["get-users"],
-      queryFn: serverLoader<typeof loader>,
-    });
-
+  const users = server.getUsers();
   return defer({ users });
 };
 
 export default function UserRoute() {
-  const { users } = useLoaderData<typeof clientLoader>();
+  const { users } = useLoaderData<typeof loader>();
 
   const params = useParams();
   const selectedUserId = params.userId;
 
   return (
-    <Layout isLoading={false} users={users} selectedUserId={selectedUserId}>
+    <Layout users={users} selectedUserId={selectedUserId}>
       <Outlet />
     </Layout>
   );

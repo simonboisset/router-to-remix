@@ -1,4 +1,3 @@
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Links,
@@ -9,18 +8,18 @@ import {
 } from "@remix-run/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./api/query-client";
-import { RootSnackbar } from "./components/snackbar";
-import "./mains.css";
+import { Toaster } from "./components/ui/sonner";
+import style from "./globals.css?url";
 
-const theme = createTheme();
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: style, as: "style" }];
+};
 
 export const meta: MetaFunction = () => [
   { title: "Router to Remix" },
   { name: "viewport", content: "width=device-width,initial-scale=1" },
   { charset: "utf-8" },
 ];
-
-export const links: LinksFunction = () => [];
 
 const App = () => {
   return (
@@ -30,15 +29,12 @@ const App = () => {
         <Links />
       </head>
       <body>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <QueryClientProvider client={queryClient}>
-            <Outlet />
-            <RootSnackbar />
-          </QueryClientProvider>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+        </QueryClientProvider>
         <ScrollRestoration />
         <Scripts />
+        <Toaster />
       </body>
     </html>
   );

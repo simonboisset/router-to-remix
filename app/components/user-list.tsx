@@ -1,4 +1,3 @@
-import { List } from "@mui/material";
 import type { SerializeFrom } from "@remix-run/node";
 import { Await } from "@remix-run/react";
 import { Suspense } from "react";
@@ -11,15 +10,10 @@ import {
 
 type UserListProps = {
   users: Promise<SerializeFrom<User[] | null> | undefined>;
-  isLoading: boolean;
   selectedUserId?: string | null;
 };
 
-export const UserList = ({
-  users,
-  isLoading,
-  selectedUserId,
-}: UserListProps) => (
+export const UserList = ({ users, selectedUserId }: UserListProps) => (
   <Suspense
     fallback={Array.from({ length: USER_ITEM_SKELETONS_COUNT }).map(
       (_, index) => (
@@ -29,19 +23,15 @@ export const UserList = ({
   >
     <Await resolve={users}>
       {(usersList) => (
-        <List>
-          {isLoading
-            ? Array.from({ length: USER_ITEM_SKELETONS_COUNT }).map(
-                (_, index) => <UserItemSkeleton key={index} />
-              )
-            : usersList?.map((user) => (
-                <UserItem
-                  key={user.id}
-                  user={user}
-                  selected={user.id === selectedUserId}
-                />
-              ))}
-        </List>
+        <>
+          {usersList?.map((user) => (
+            <UserItem
+              key={user.id}
+              user={user}
+              selected={user.id === selectedUserId}
+            />
+          ))}
+        </>
       )}
     </Await>
   </Suspense>
