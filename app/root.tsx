@@ -6,8 +6,6 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./api/query-client";
 import { Toaster } from "./components/ui/sonner";
 import style from "./globals.css?url";
 
@@ -29,9 +27,7 @@ const App = () => {
         <Links />
       </head>
       <body>
-        <QueryClientProvider client={queryClient}>
-          <Outlet />
-        </QueryClientProvider>
+        <Outlet />
         <ScrollRestoration />
         <Scripts />
         <Toaster />

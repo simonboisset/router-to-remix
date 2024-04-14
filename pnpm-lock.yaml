@@ -23,9 +23,6 @@ dependencies:
   '@remix-run/serve':
     specifier: ^2.8.1
     version: 2.8.1(typescript@5.4.4)
-  '@tanstack/react-query':
-    specifier: ^5.29.0
-    version: 5.29.0(react@18.2.0)
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -1605,19 +1602,6 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
-
-  /@tanstack/query-core@5.29.0:
-    resolution: {integrity: sha512-WgPTRs58hm9CMzEr5jpISe8HXa3qKQ8CxewdYZeVnA54JrPY9B1CZiwsCoLpLkf0dGRZq+LcX5OiJb0bEsOFww==}
-    dev: false
-
-  /@tanstack/react-query@5.29.0(react@18.2.0):
-    resolution: {integrity: sha512-yxlhHB73jaBla6h5B6zPaGmQjokkzAhMHN4veotkPNiQ3Ac/mCxgABRZPsJJrgCTvhpcncBZcDBFxaR2B37vug==}
-    peerDependencies:
-      react: ^18.0.0
-    dependencies:
-      '@tanstack/query-core': 5.29.0
-      react: 18.2.0
-    dev: false
 
   /@types/acorn@4.0.6:
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}
