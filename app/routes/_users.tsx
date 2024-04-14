@@ -1,15 +1,14 @@
-import { defer } from "@remix-run/node";
-import { Outlet, useLoaderData, useParams } from "@remix-run/react";
-import { server } from "../api/data.server";
+import { defer, Outlet, useLoaderData, useParams } from "@remix-run/react";
+import { api } from "~/api/api";
 import { Layout } from "../components/layout";
 
-export const loader = async () => {
-  const users = server.getUsers();
+export const clientLoader = async () => {
+  const users = api.getUsers();
   return defer({ users });
 };
 
 export default function UserRoute() {
-  const { users } = useLoaderData<typeof loader>();
+  const { users } = useLoaderData<typeof clientLoader>();
 
   const params = useParams();
   const selectedUserId = params.userId;

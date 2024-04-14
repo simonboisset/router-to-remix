@@ -17,7 +17,7 @@ const getUsersSchema = z.object({
 const getUsers = async () => {
   const response = await fetch("/api/users");
   const data = await response.json();
-  return getUsersSchema.parse(data);
+  return getUsersSchema.parse(data).users;
 };
 
 const userDetailsSchema = z.object({
