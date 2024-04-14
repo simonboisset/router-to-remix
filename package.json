@@ -7,7 +7,7 @@
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "start": "remix-serve ./build/server/index.js",
-    "server": "npx tsx ./fastify.ts",
+    "server": "npx tsx ./app/fastify.ts",
     "format": "pnpm biome format ./app/** --write"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 import Fastify from "fastify";
 import { z } from "zod";
-import { server } from "./app/api/data.server";
+import { server } from "./api/data.server";
 
 const fastify = Fastify({
   logger: true,
@@ -15,13 +15,13 @@ fastify.post("/api/users", async (request: any) => {
   const { name, age } = z
     .object({ name: z.string(), age: z.string() })
     .parse(request.body);
-  const id = server.createUser({ name, age });
+  const id = await server.createUser({ name, age });
   return { id, name, age };
 });
 
 fastify.delete("/api/users/:id", async (request: any) => {
   const id = z.object({ id: z.string() }).parse(request.params).id;
-  const user = server.deleteUser(id);
+  const user = await server.deleteUser(id);
   return user;
 });
 
@@ -36,7 +36,7 @@ fastify.put("/api/users/:id", async (request: any) => {
 
 fastify.get("/api/users/:id", async (request: any) => {
   const id = z.object({ id: z.string() }).parse(request.params).id;
-  const user = server.getUserDetails(id);
+  const user = await server.getUserDetails(id);
   if (!user) {
     throw new Error("User not found");
   }

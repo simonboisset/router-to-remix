@@ -1,8 +1,8 @@
-import { defer } from "@remix-run/node";
 import {
   Await,
   type ClientActionFunctionArgs,
   ClientLoaderFunctionArgs,
+  defer,
   redirect,
   useLoaderData,
   useNavigation,

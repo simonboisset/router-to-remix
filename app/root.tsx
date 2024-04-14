@@ -1,4 +1,4 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/react";
 import {
   Links,
   Meta,
@@ -7,11 +7,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { Toaster } from "./components/ui/sonner";
-import style from "./globals.css?url";
-
-export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: style, as: "style" }];
-};
+import "./globals.css";
 
 export const meta: MetaFunction = () => [
   { title: "Router to Remix" },

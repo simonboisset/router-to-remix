@@ -4,20 +4,18 @@ export const promiseOf = async <T>(promise: T) => {
   return promise;
 };
 
-const getUsersSchema = z.object({
-  users: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      age: z.string(),
-    })
-  ),
-});
+const getUsersSchema = z.array(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    age: z.string(),
+  })
+);
 
 const getUsers = async () => {
   const response = await fetch("/api/users");
   const data = await response.json();
-  return getUsersSchema.parse(data).users;
+  return getUsersSchema.parse(data);
 };
 
 const userDetailsSchema = z.object({
@@ -29,6 +27,7 @@ const userDetailsSchema = z.object({
 const getUserDetails = async (id: string) => {
   const response = await fetch(`/api/users/${id}`);
   const data = await response.json();
+
   return userDetailsSchema.parse(data);
 };
 
