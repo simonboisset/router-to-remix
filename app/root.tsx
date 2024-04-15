@@ -4,11 +4,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout";
 import { UserFormSkeleton } from "./components/user-form";
 import "./globals.css";
-import RootPage, { clientLoader as rootLoader } from "./routes/_users";
-import UserRoute, {
-  clientAction as userAction,
-  clientLoader as userLoader,
-} from "./routes/_users.$userId";
+import RootPage from "./routes/_users";
+import UserRoute from "./routes/_users.$userId";
 
 const HydrateFallback = () => (
   <Layout isLoading users={[]} selectedUserId={""}>
@@ -16,35 +13,22 @@ const HydrateFallback = () => (
   </Layout>
 );
 
-const router = createBrowserRouter(
-  [
-    {
-      HydrateFallback,
-      path: "/",
-      element: <RootPage />,
-      loader: rootLoader,
-      children: [
-        {
-          index: true,
-          element: <UserRoute />,
-          loader: userLoader,
-          action: userAction,
-        },
-        {
-          path: ":userId",
-          element: <UserRoute />,
-          loader: userLoader,
-          action: userAction,
-        },
-      ],
-    },
-  ],
+const router = createBrowserRouter([
   {
-    future: {
-      v7_partialHydration: true,
-    },
-  }
-);
+    path: "/",
+    element: <RootPage />,
+    children: [
+      {
+        index: true,
+        element: <UserRoute />,
+      },
+      {
+        path: ":userId",
+        element: <UserRoute />,
+      },
+    ],
+  },
+]);
 
 const root = document.getElementById("root");
 if (!root) {

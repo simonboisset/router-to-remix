@@ -1,6 +1,7 @@
 import { api } from "app/api/api";
 import { User } from "app/api/data.server";
-import { Outlet, useLoaderData, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useParams } from "react-router-dom";
 import { Layout } from "../components/layout";
 
 export const clientLoader = async () => {
@@ -9,8 +10,15 @@ export const clientLoader = async () => {
 };
 
 export default function UserRoute() {
-  const { users } = useLoaderData() as { users: User[] };
+  const [users, setUsers] = useState<User[] | null>(null);
   const params = useParams();
+  useEffect(() => {
+    const init = async () => {
+      const users = await api.getUsers();
+      setUsers(users);
+    };
+    init();
+  }, [params]);
 
   const selectedUserId = params.userId;
 
