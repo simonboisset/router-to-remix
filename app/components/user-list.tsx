@@ -1,4 +1,3 @@
-import type { SerializeFrom } from "@remix-run/node";
 import type { User } from "../api/data.server";
 import { UserItem } from "./user-item";
 import {
@@ -7,7 +6,7 @@ import {
 } from "./user-item-skeleton";
 
 type UserListProps = {
-  users: SerializeFrom<User[] | null> | undefined;
+  users: User[] | null;
   selectedUserId?: string | null;
   isLoading?: boolean;
 };

@@ -1,12 +1,11 @@
-import type { SerializeFrom } from "@remix-run/node";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router-dom";
 import type { User } from "../api/data.server";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { UserList } from "./user-list";
 
 type LayoutProps = {
-  users: SerializeFrom<User[]> | undefined;
+  users: User[] | null;
   children: React.ReactNode;
   selectedUserId?: string | null;
   isLoading?: boolean;

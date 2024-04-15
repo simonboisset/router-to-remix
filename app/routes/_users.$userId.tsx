@@ -1,17 +1,17 @@
+import { api } from "app/api/api";
 import {
-  type ClientActionFunctionArgs,
-  ClientLoaderFunctionArgs,
+  LoaderFunctionArgs,
   redirect,
   useLoaderData,
   useNavigation,
   useParams,
-} from "@remix-run/react";
+} from "react-router-dom";
 import { z } from "zod";
-import { api } from "~/api/api";
 
+import { User } from "app/api/data.server";
 import { UserForm } from "../components/user-form";
 
-export const clientLoader = async ({ params }: ClientLoaderFunctionArgs) => {
+export const clientLoader = async ({ params }: LoaderFunctionArgs) => {
   const userId = params.userId;
 
   if (!userId) return { user: null };
@@ -19,10 +19,7 @@ export const clientLoader = async ({ params }: ClientLoaderFunctionArgs) => {
   return { user };
 };
 
-export const clientAction = async ({
-  request,
-  params,
-}: ClientActionFunctionArgs) => {
+export const clientAction = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = params.userId;
   const formData = await request.formData();
   const name = formData.get("name");
@@ -55,7 +52,7 @@ export const clientAction = async ({
 };
 
 export default function UserRoute() {
-  const { user } = useLoaderData<typeof clientLoader>();
+  const { user } = useLoaderData() as { user: null | User };
   const navigation = useNavigation();
   const method = navigation.formMethod;
   const params = useParams();
@@ -64,9 +61,9 @@ export default function UserRoute() {
     `/${params.userId || ""}`
   );
 
-  const isUserCreating = method === "POST" && isSubmitting;
-  const isUserUpdating = method === "PUT" && isSubmitting;
-  const isUserDeleting = method === "DELETE" && isSubmitting;
+  const isUserCreating = method === "post" && isSubmitting;
+  const isUserUpdating = method === "put" && isSubmitting;
+  const isUserDeleting = method === "delete" && isSubmitting;
   const isLoading = navigation.state !== "idle" && !isSubmitting;
 
   return (

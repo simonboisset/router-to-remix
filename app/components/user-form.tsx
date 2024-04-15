@@ -1,6 +1,5 @@
-import type { SerializeFrom } from "@remix-run/node";
-import { Form, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import { Form, useSubmit } from "react-router-dom";
 import type { User } from "../api/data.server";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { LoadingButton } from "./ui/loading-button";
@@ -8,7 +7,7 @@ import { Skeleton } from "./ui/skeleton";
 import { TextField } from "./ui/text-field";
 
 type UserFomrProps = {
-  user?: SerializeFrom<User> | null | undefined;
+  user?: User | null;
   isCreating?: boolean;
   isUpdating?: boolean;
   isDeleting?: boolean;

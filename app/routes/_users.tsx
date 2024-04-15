@@ -1,5 +1,6 @@
-import { Outlet, useLoaderData, useParams } from "@remix-run/react";
-import { api } from "~/api/api";
+import { api } from "app/api/api";
+import { User } from "app/api/data.server";
+import { Outlet, useLoaderData, useParams } from "react-router-dom";
 import { Layout } from "../components/layout";
 
 export const clientLoader = async () => {
@@ -8,7 +9,7 @@ export const clientLoader = async () => {
 };
 
 export default function UserRoute() {
-  const { users } = useLoaderData<typeof clientLoader>();
+  const { users } = useLoaderData() as { users: User[] };
   const params = useParams();
 
   const selectedUserId = params.userId;
