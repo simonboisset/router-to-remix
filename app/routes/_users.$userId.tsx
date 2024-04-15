@@ -1,28 +1,23 @@
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
-  type ClientActionFunctionArgs,
-  ClientLoaderFunctionArgs,
   redirect,
   useLoaderData,
   useNavigation,
   useParams,
 } from "@remix-run/react";
 import { z } from "zod";
-import { api } from "~/api/api";
-
+import { server } from "~/api/data.server";
 import { UserForm } from "../components/user-form";
 
-export const clientLoader = async ({ params }: ClientLoaderFunctionArgs) => {
+export const loader = async ({ params }: LoaderFunctionArgs) => {
   const userId = params.userId;
 
   if (!userId) return { user: null };
-  const user = await api.getUserDetails(userId);
+  const user = await server.getUserDetails(userId);
   return { user };
 };
 
-export const clientAction = async ({
-  request,
-  params,
-}: ClientActionFunctionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const userId = params.userId;
   const formData = await request.formData();
   const name = formData.get("name");
@@ -31,7 +26,7 @@ export const clientAction = async ({
     const user = z
       .object({ name: z.string(), age: z.string() })
       .parse({ name, age });
-    const res = await api.createUser(user);
+    const res = await server.createUser(user);
 
     return redirect(`/${res.id}`);
   }
@@ -40,14 +35,14 @@ export const clientAction = async ({
     const user = z
       .object({ name: z.string(), age: z.string(), id: z.string() })
       .parse({ name, age, id: userId });
-    const res = await api.updateUser(user);
+    const res = await server.updateUser(user);
 
     return { user: res };
   }
 
   if (request.method === "DELETE") {
     if (!userId) throw new Error("User not found");
-    await api.deleteUser(userId);
+    await server.deleteUser(userId);
 
     return redirect("/");
   }
@@ -55,7 +50,7 @@ export const clientAction = async ({
 };
 
 export default function UserRoute() {
-  const { user } = useLoaderData<typeof clientLoader>();
+  const { user } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const method = navigation.formMethod;
   const params = useParams();

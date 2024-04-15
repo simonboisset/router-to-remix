@@ -6,8 +6,6 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import { Layout } from "./components/layout";
-import { UserFormSkeleton } from "./components/user-form";
 
 import "./globals.css";
 
@@ -16,24 +14,6 @@ export const meta: MetaFunction = () => [
   { name: "viewport", content: "width=device-width,initial-scale=1" },
   { charset: "utf-8" },
 ];
-
-export function HydrateFallback() {
-  return (
-    <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Layout isLoading users={[]} selectedUserId={""}>
-          <UserFormSkeleton />
-        </Layout>
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  );
-}
 
 const App = () => {
   return (

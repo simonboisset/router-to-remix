@@ -6,14 +6,6 @@ import tsconfigPaths from "vite-tsconfig-paths";
 installGlobals();
 
 export default defineConfig({
-  server: {
-    port: 3000,
-    proxy: {
-      "/api": {
-        target: "http://localhost:5000",
-        changeOrigin: true,
-      },
-    },
-  },
-  plugins: [remix({ ssr: false }), tsconfigPaths()],
+  server: { port: 3000 },
+  plugins: [remix({ ssr: true }), tsconfigPaths()],
 });
