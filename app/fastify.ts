@@ -15,7 +15,7 @@ fastify.post("/api/users", async (request: any) => {
   const { name, age } = z
     .object({ name: z.string(), age: z.string() })
     .parse(request.body);
-  const id = await server.createUser({ name, age });
+  const { id } = await server.createUser({ name, age });
   return { id, name, age };
 });
 

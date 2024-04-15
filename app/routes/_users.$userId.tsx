@@ -1,26 +1,22 @@
 import {
-  Await,
   type ClientActionFunctionArgs,
   ClientLoaderFunctionArgs,
-  defer,
   redirect,
   useLoaderData,
   useNavigation,
   useParams,
 } from "@remix-run/react";
-import { Suspense } from "react";
-import { toast } from "sonner";
 import { z } from "zod";
 import { api } from "~/api/api";
 
-import { UserForm, UserFormSkeleton } from "../components/user-form";
+import { UserForm } from "../components/user-form";
 
 export const clientLoader = async ({ params }: ClientLoaderFunctionArgs) => {
   const userId = params.userId;
 
-  if (!userId) return defer({ user: null });
-  const user = api.getUserDetails(userId);
-  return defer({ user });
+  if (!userId) return { user: null };
+  const user = await api.getUserDetails(userId);
+  return { user };
 };
 
 export const clientAction = async ({
@@ -36,7 +32,6 @@ export const clientAction = async ({
       .object({ name: z.string(), age: z.string() })
       .parse({ name, age });
     const res = await api.createUser(user);
-    toast("User created successfully");
 
     return redirect(`/${res.id}`);
   }
@@ -46,7 +41,6 @@ export const clientAction = async ({
       .object({ name: z.string(), age: z.string(), id: z.string() })
       .parse({ name, age, id: userId });
     const res = await api.updateUser(user);
-    toast("User updated successfully");
 
     return { user: res };
   }
@@ -54,7 +48,6 @@ export const clientAction = async ({
   if (request.method === "DELETE") {
     if (!userId) throw new Error("User not found");
     await api.deleteUser(userId);
-    toast("User deleted successfully");
 
     return redirect("/");
   }
@@ -75,19 +68,14 @@ export default function UserRoute() {
   const isUserUpdating = method === "PUT" && isSubmitting;
   const isUserDeleting = method === "DELETE" && isSubmitting;
   const isLoading = navigation.state !== "idle" && !isSubmitting;
+
   return (
-    <Suspense fallback={<UserFormSkeleton />}>
-      <Await resolve={user}>
-        {(usr) => (
-          <UserForm
-            user={usr}
-            isCreating={isUserCreating}
-            isUpdating={isUserUpdating}
-            isDeleting={isUserDeleting}
-            isLoading={isLoading}
-          />
-        )}
-      </Await>
-    </Suspense>
+    <UserForm
+      user={user}
+      isCreating={isUserCreating}
+      isUpdating={isUserUpdating}
+      isDeleting={isUserDeleting}
+      isLoading={isLoading}
+    />
   );
 }
