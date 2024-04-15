@@ -4,7 +4,7 @@ This project is for demonstrating how to use Remix for React Router migration SS
 
 ## Branches
 
-- `main`: The starting point of the project. It uses React  and react-query for client-side routing with fastify api.
+- `main`: The starting point of the project. It uses React for client-side routing with fastify api.
 - `react-router`: The second step of the migration. It uses React Router for client-side loader and action paterns with fastify api.
 - `remix-spa`: The first step of the migration. It uses Remix for client-side routing with fastify api.
 - `remix`: The final version of the project. It uses Remix full-stack framework for routing and server-side rendering.
@@ -26,4 +26,3 @@ We use Mui for the UI components. You can find the documentation [here](https://
 - [React Router tuto](https://reactrouter.com/en/main/start/tutorial)
 - [Remix vite setup](https://remix.run/docs/en/main/future/vite)
 - [Remix migrating from React Router](https://remix.run/docs/en/main/guides/migrating-react-router-app)
-- [React Query meet React Router](https://tkdodo.eu/blog/react-query-meets-react-router)
