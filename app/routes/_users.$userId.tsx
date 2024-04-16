@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   redirect,
   useLoaderData,

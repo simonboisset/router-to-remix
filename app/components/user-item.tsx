@@ -17,7 +17,6 @@ export const UserItem = ({ user, selected }: UserItemProps) => {
     !!navigation.location?.pathname &&
     location.pathname !== navigation.location.pathname &&
     navigation.location.pathname.includes(user.id);
-  console.log("isNavigating", user.id, location.pathname, selected);
 
   return (
     <Button asChild variant={selected ? "default" : "outline"}>
